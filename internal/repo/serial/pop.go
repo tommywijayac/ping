@@ -8,7 +8,7 @@ import (
 //Pop is a blocking function that invokes callback function when channel receives data
 //TODO: add callback fn as parameter
 //TODO: must handle SIGTERM
-func (s *Serial) Pop() {
+func (s *Serial) Receive() {
 	for {
 		select {
 		case data := <-s.channel:

@@ -14,7 +14,7 @@ func main() {
 
 	//TODO: move to usecase
 	go serial.Listen("test")
-	go serial.Pop()
+	go serial.Receive()
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
