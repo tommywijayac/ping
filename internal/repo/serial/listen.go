@@ -18,7 +18,9 @@ func (s *Serial) Listen(port string) error {
 		Size: 8,
 	})
 	if err != nil {
-		return fmt.Errorf("fail to open serial port: %w", err)
+		//TODO: return err
+		fmt.Println(err)
+		//return fmt.Errorf("fail to open serial port: %w", err)
 	}
 
 	scanner := bufio.NewScanner(stream)
