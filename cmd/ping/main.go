@@ -29,6 +29,9 @@ func main() {
 		done <- true
 	}()
 
+	//start client-server conn
+	initServer()
+
 	<-done
 	fmt.Println("closing")
 }
