@@ -3,15 +3,15 @@ package serial
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
 	"time"
 
 	tarmserial "github.com/tarm/serial"
+	"github.com/tommywijayac/ping/internal/model"
 )
 
-//Listen is a blocking function that continuously listen to a serial port and push received data to channel
+//Listen continuously listen to a serial port and push received data to channel.
 //TODO: must handle SIGTERM
-func (s *Serial) Listen(port string) error {
+func (r *Repo) Listen(port string) error {
 	stream, err := tarmserial.OpenPort(&tarmserial.Config{
 		Name: "", //COMxx in Windows or /dev/tty in Linux
 		Baud: 9600,
@@ -29,15 +29,23 @@ func (s *Serial) Listen(port string) error {
 
 	for {
 		//TODO: change into real serial listener
-		data := rand.Intn(100)
-		s.push(data)
-		fmt.Printf("pushed %d into channel\n", data)
+		//data := rand.Intn(100)
+		// s.push(data)
+		//fmt.Printf("pushed %d into channel\n", data)
 
 		time.Sleep(2 * time.Second)
 	}
 }
 
 //Push will put data into channel
-func (s *Serial) push(data int) {
-	s.channel <- data
+func (r *Repo) push(data int) {
+	r.channel <- model.RawRoom{
+		Id:        data,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
+//[DEV] Push put an integer value into display channel
+func (r *Repo) Push(data int) {
+	r.push(data)
 }

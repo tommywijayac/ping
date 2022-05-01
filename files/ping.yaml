@@ -1,0 +1,10 @@
+room:
+  1:
+    title: "ruang ayam"
+    icon_path: ""
+  2:
+    title: "ruang kambing"
+    icon_path: ""
+  3:
+    title: "ruang kucing"
+    icon_path: ""
