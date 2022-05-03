@@ -5,17 +5,14 @@
       :key="room.id"
       :title="room.title"
       :state="room.state"
-      @pingAck="onPingAck(room, room.id)"
-    />
-    <!-- <RoomCard :state="'active'" :title="'test'" :key="333" :id='333'
       @pingAck="onPingAck(room)"
-    /> -->
-    <button v-on:click="sendMessage('hello')">Dummy trigger (simulate BE trigger)</button>
+    />
   </div>
 </template>
 
 <script>
 import RoomCard from './components/RoomCard.vue'
+import { reactive } from 'vue'
 
 export default {
   name: 'App',
@@ -24,7 +21,7 @@ export default {
   },
   data() {
     return {
-      rooms: [{
+      rooms: reactive([{
         id: 0,
         title: '<placeholder-title>',
         state: 'active',
@@ -44,32 +41,16 @@ export default {
         id: 4,
         title: '<placeholder-title>',
         state: '',
-      }],
+      }]),
       connection: null
-    }
-  },
-  watch: {
-    rooms: {
-      handler(newValue, oldValue) {
-        console.log("hello from watcher", newValue, oldValue)
-      },
     }
   },
   methods: {
     sendMessage: function(message) {
       this.connection.send(message);
     },
-    onPingAck: function(room, roomId) {
-      console.log(room);
-      console.log(roomId);
-      console.log(this.rooms);
-
-      // const toChangeRoom = this.rooms.find(r => r.id === roomId);
-      // toChangeRoom.state = '';
-
-      //this.rooms.push({id:333, title:"pushed from FE", state: ""})
-
-      //this.connection.send('hellaw from onPingAck');
+    onPingAck: function(room) {
+      room.state = '';
     },
   },
   created: function(){
@@ -116,16 +97,22 @@ export default {
 
 <style>
 body {
+  /* abs height value */
   height: 100vh;
+  /* old way size (padding&margin) calculation */
   box-sizing: border-box;
-  margin: 0px !important; /* override vue default 8px margin */
+  /* override vue default 8px margin */
+  margin: 0px !important;
 }
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* relative height to body */
   height: 100%;
+  /* give whitespace */
   box-sizing: border-box;
   padding: 3%;
 }

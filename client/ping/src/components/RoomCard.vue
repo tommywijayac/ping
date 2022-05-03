@@ -3,10 +3,10 @@
     ref='card'
     :class="[
       'card',
-      { 'card-pulse': localState === 'active' },
-      { 'card-pulse-warn': localState === 'warning' }
+      { 'card-pulse': state === 'active' },
+      { 'card-pulse-warn': state === 'warning' }
     ]"
-    v-on="localState === 'active' || localState === 'warning' ? 
+    v-on="state === 'active' || state === 'warning' ? 
       { click: pingAck } : {}"
   >
     <div ref='content' class='content'>
@@ -37,15 +37,6 @@ export default {
       isAnimeFinished: true,
     }
   },
-  watch: {
-    localState(oldState, newState) {
-      console.log("inside watcher")
-      if (oldState !== newState) {
-        console.log("changed..?")
-        this.localState = newState;
-      }
-    }
-  },
   methods: {
     pingAck: function(){
       if (!this.isAnimeFinished) {
@@ -68,7 +59,7 @@ export default {
       //with big enough value
       setTimeout(this.pingAckAnimationFinish, 2500);
       
-      //notify server
+      //notify parent to update state to inactive
       this.$emit('pingAck');
     },
     pingAckAnimationFinish: function() {
