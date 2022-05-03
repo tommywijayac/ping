@@ -1,12 +1,9 @@
 package http
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/websocket"
-	"github.com/tommywijayac/ping/internal/model"
+	"strconv"
 )
 
 const client string = "http://localhost:8080" //the only IP we expect requests are coming from
@@ -33,21 +30,22 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 			//ReadMessage is a blocking function that waits for new message.
 			_, message, err := h.conn.ReadMessage()
 			if err != nil {
-				if websocket.IsCloseError(err, websocket.CloseGoingAway) {
-					return
-				}
+				// if websocket.IsCloseError(err, websocket.CloseGoingAway) {
+				// 	return
+				// }
 
 				log.Printf("http: handler: read websocket message err: %s\n", err)
+				return
 			}
 
-			room := model.Room{}
-			err = json.Unmarshal(message, &room)
+			//client is expected to send room ID
+			roomID, err := strconv.Atoi(string(message))
 			if err != nil {
 				log.Printf("http: handler: fail unmarshal websocket message err: %s\n", err)
 				continue
 			}
 
-			h.ucDisplay.ReceiveRoomPingAck(room)
+			h.ucDisplay.ReceiveRoomPingAck(roomID)
 		}
 	}()
 	//if websocket conn isn't created, then will not increment waitgroup
@@ -60,6 +58,11 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 			log.Printf("http: handler: write websocket message err: %s\n", err)
 		}
 	}()
+
+	//send default room config
+	if err := h.ucDisplay.SendAllRoomStates(h.conn); err != nil {
+		log.Printf("http: handler: send default room err: %s\n", err)
+	}
 
 	//wait for close signal from app
 	<-h.close

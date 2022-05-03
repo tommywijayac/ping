@@ -2,41 +2,49 @@ package display
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/gorilla/websocket"
+	"github.com/tommywijayac/ping/internal/config"
 	"github.com/tommywijayac/ping/internal/model"
 	"github.com/tommywijayac/ping/internal/repo/serial"
 )
 
 type Usecase struct {
 	repoSerial *serial.Repo
-	roomState  [6]model.Room
+	rooms      []model.Room //state source-of-truth. retain room order
 }
 
-func New(serial *serial.Repo) *Usecase {
+func New(rcfg []config.RoomConfig, serial *serial.Repo) *Usecase {
+	rooms := []model.Room{}
+	for _, r := range rcfg {
+		rooms = append(rooms, model.Room{
+			ID:       r.ID,
+			Title:    r.Title,
+			IconPath: r.IconPath,
+			State:    "", //all begin with inactive (empty)
+		})
+	}
+
 	return &Usecase{
 		repoSerial: serial,
-	}
-}
-
-//SendRoomPing send a room ping to client
-func (u *Usecase) SendRoomPing(conn *websocket.Conn) error {
-	stream := u.repoSerial.Stream()
-
-	for {
-		select {
-		case data := <-stream:
-			conn.WriteJSON(data)
-			log.Printf("writing %v", data)
-		}
+		rooms:      rooms,
 	}
 }
 
 //ReceiveRoomPingAck receives a room ping acknowledgement from client,
-//and will update room state in memory.
-func (u *Usecase) ReceiveRoomPingAck(room model.Room) error {
-	fmt.Println(room)
+//and will set room state to inactive.
+func (u *Usecase) ReceiveRoomPingAck(roomID int) error {
+	fmt.Println(roomID)
+
+	for i := range u.rooms {
+		if u.rooms[i].ID == roomID {
+			u.rooms[i].State = ""
+			u.rooms[i].ConsecutivePing = 0
+			u.rooms[i].FirstPing = 0
+		}
+	}
+
+	fmt.Println(u.rooms)
+
 	return nil
 }
 

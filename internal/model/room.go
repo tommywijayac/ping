@@ -1,11 +1,16 @@
 package model
 
 type RawRoom struct {
-	Id        int
+	ID        int
 	Timestamp int64
 }
 
 type Room struct {
-	Title string `json:"title"`
-	State string `json:"state"`
+	ID       int    `json:"id"`
+	Title    string `json:"title"`
+	IconPath string `json:"icon_path"`
+	State    string `json:"state"`
+
+	ConsecutivePing int
+	FirstPing       int64
 }

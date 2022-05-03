@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/tommywijayac/ping/internal/config"
+	"github.com/tommywijayac/ping/internal/pkg/oto"
 	"github.com/tommywijayac/ping/internal/repo/serial"
 
 	"github.com/tommywijayac/ping/internal/usecase/display"
@@ -37,15 +38,14 @@ func main() {
 	//init config
 	cfg, err := config.Init()
 	if err != nil {
-		log.Fatalf("main: fail to init config: %v", err)
+		log.Fatalf("main: fail to init config: %v\n", err)
 	}
-	fmt.Println(cfg)
 
 	//init repo
 	repoSerial := serial.New("test")
 
 	//init usecase
-	usecaseDisplay := display.New(&repoSerial)
+	usecaseDisplay := display.New(cfg.RoomConfig, &repoSerial)
 
 	//init handler
 	handlerHttp := http.New(usecaseDisplay, wsClose, &appWg)
@@ -58,6 +58,8 @@ func main() {
 	<-closeSig
 
 	fmt.Println("main: doing cleanup..")
+	oto.Close()
 	appWg.Wait()
+
 	fmt.Println("main: terminated")
 }

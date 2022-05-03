@@ -1,10 +1,11 @@
 package config
 
 type Config struct {
-	DisplayRoom map[int]DisplayRoom `yaml:"room"`
+	RoomConfig []RoomConfig `yaml:"rooms"`
 }
 
-type DisplayRoom struct {
+type RoomConfig struct {
+	ID       int    `yaml:"id"`
 	Title    string `yaml:"title"`
 	IconPath string `yaml:"icon_path"`
 }

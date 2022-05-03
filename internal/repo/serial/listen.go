@@ -40,7 +40,7 @@ func (r *Repo) Listen(port string) error {
 //Push will put data into channel
 func (r *Repo) push(data int) {
 	r.channel <- model.RawRoom{
-		Id:        data,
+		ID:        data,
 		Timestamp: time.Now().Unix(),
 	}
 }

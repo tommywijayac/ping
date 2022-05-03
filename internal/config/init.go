@@ -10,7 +10,6 @@ import (
 
 func Init() (*Config, error) {
 	filepath := os.Getenv("GOPATH") + "\\src\\ping\\files\\ping.yaml"
-	fmt.Println(filepath)
 
 	file, err := ioutil.ReadFile(filepath)
 	if err != nil {
