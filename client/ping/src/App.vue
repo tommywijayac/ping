@@ -5,6 +5,7 @@
       :key="room.id"
       :title="room.title"
       :state="room.state"
+      :icon_path="room.icon_path"
       @pingAck="onPingAck(room)"
     />
   </div>
@@ -23,24 +24,19 @@ export default {
     return {
       rooms: reactive([{
         id: 0,
-        title: '<placeholder-title>',
-        state: 'active',
+        title: 'Ruangan A',
+        state: '',
+        icon_path: 'default.png'
       },{
         id: 1,
-        title: '<placeholder-title>',
-        state: 'warning',
+        title: 'Ruangan B',
+        state: 'active',
+        icon_path: 'default.png'
       },{
         id: 2,
-        title: '<placeholder-title>',
-        state: '',
-      },{
-        id: 3,
-        title: '<placeholder-title>',
-        state: 'active',
-      },{
-        id: 4,
-        title: '<placeholder-title>',
-        state: '',
+        title: 'Ruangan C',
+        state: 'warning',
+        icon_path: 'default.png'
       }]),
       connection: null
     }
@@ -50,6 +46,7 @@ export default {
       this.connection.send(message);
     },
     onPingAck: function(room) {
+      //set clicked room state to inactive
       room.state = '';
     },
   },
@@ -58,21 +55,12 @@ export default {
     this.connection = new WebSocket("ws://localhost:3000/ping")
 
     //store app context
-    const app = this
+    const self = this
 
     this.connection.onmessage = function(event) {
       var msg = JSON.parse(event.data)
+      self.rooms = msg;
       console.log(msg)
-
-      //TODO: try mutate directly here
-      //Result: 
-      // var ref = msg[0].id
-      // const room = app.rooms.find(r => r.id === ref)
-      // room.state = "active"
-
-      //TODO: try modifying by push
-      //Result: 
-      app.rooms.push({id:333, title:"pushed from FE", state: ""})
 
       // var rooms = []
 

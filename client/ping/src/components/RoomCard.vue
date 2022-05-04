@@ -11,9 +11,13 @@
   >
     <div ref='content' class='content'>
       <span class="title">{{ title }}</span>
-      <span>image</span>
-      <span>time</span>
+      <span class="image"><img :src="require('@/assets/' + icon_path)" width="64" height="64"></span>
+      <span class="time">time</span>
     </div>
+
+    <!-- located above content but below checkmark -->
+    <div :class="[{'card-inactive-overlay' : state === ''}]"></div>
+
     <div ref='checkmarkcontainer' class='checkmark_container' hidden>
       <svg ref='checkmark' class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
         <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
@@ -27,7 +31,8 @@
 export default {
   props: {
     title: { required: true, type: String},
-    state: { default: '', type: String}
+    state: { default: '', type: String},
+    icon_path: {default: '', type: String}
   },
   data() {
     return {
@@ -85,7 +90,7 @@ export default {
 /********************* CARD **************************/
 .card {
   border: 1px solid black;
-  background-color: #333333;
+  /*background-color: #333333;*/
 
   /* disable text selection */
   -moz-user-select: none;
@@ -99,7 +104,8 @@ export default {
   flex-direction: column;
   justify-content: center;
   
-  /* so we can place div.check on top of div.content*/
+  /* so we can place div.checkmarkcontainer and div.cardoverlay */
+  /* on top of div.content */
   position: relative;
 
   transition: background-color 0.2s linear;
@@ -145,6 +151,16 @@ export default {
   }
 }
 
+.card-inactive-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+
+  /* position at parent's top left */
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
 </style>
 
 <style scoped>
@@ -260,5 +276,10 @@ export default {
 .title {
   font-size: 3rem;
   font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 10px;
+}
+
+.image {
+  margin-bottom: 10px;
 }
 </style>
