@@ -1,17 +1,20 @@
 package display
 
 import (
+	"github.com/tommywijayac/ping/internal/config"
 	"github.com/tommywijayac/ping/internal/repo/room"
 	"github.com/tommywijayac/ping/internal/repo/serial"
 )
 
 type Usecase struct {
+	pingDelay  int64
 	repoSerial *serial.Repo
 	repoRoom   *room.Repo
 }
 
-func New(serial *serial.Repo, room *room.Repo) *Usecase {
+func New(cfg *config.Config, serial *serial.Repo, room *room.Repo) *Usecase {
 	return &Usecase{
+		pingDelay:  cfg.PingDelay,
 		repoSerial: serial,
 		repoRoom:   room,
 	}

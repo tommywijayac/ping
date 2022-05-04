@@ -15,3 +15,4 @@ rooms:
   - id: 4
     title: "ruang pari"
     icon_path: "ray.png"
+ping_delay: 5

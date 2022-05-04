@@ -11,12 +11,8 @@ import (
 //via supplied websocket connection.
 func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
 	rs := u.repoRoom.GetAll()
-	if len(rs) == 0 {
-		return fmt.Errorf("rooms not initialized")
-	}
-
 	if err := conn.WriteJSON(rs); err != nil {
-		return fmt.Errorf("[usecase] fail to send all room attributes: %v", err)
+		return fmt.Errorf("fail to write json to websocket: %v", err)
 	}
 
 	log.Printf("[usecase] send all room attributes: %+v\n", rs)
@@ -42,15 +38,13 @@ func (u *Usecase) SendRoomPing(conn *websocket.Conn) {
 			id := raw.ID
 			ts := raw.Timestamp
 
-			//TODO: should be in usecase/serial until ----
 			r, err := u.repoRoom.Get(id)
 			if err != nil {
 				log.Printf("[usecase] fail to send room ping: %s\n", err)
 				continue
 			}
 
-			//TODO: 5 from config
-			if r.LastPingTimestamp != 0 && ts-r.LastPingTimestamp < 5 {
+			if r.LastPingTimestamp != 0 && ts-r.LastPingTimestamp < u.pingDelay {
 				//ignore repeated consecutive ping in short timespan
 				continue
 			}
@@ -61,16 +55,15 @@ func (u *Usecase) SendRoomPing(conn *websocket.Conn) {
 				continue
 			}
 
-			//notify changes to queue
-			//TODO: ---------------------------------
-
-			rs := u.repoRoom.GetAll()
-			if err := conn.WriteJSON(rs); err != nil {
+			//send all room attributes (overwrite) instead of individual rooms. reason:
+			//1. easier. FE no need to look to their array first
+			//2. FE & BE always in sync in all time. no need to build separate mechanism to sync every x min
+			//3. vue reactivity is pretty smart. even though array changes, ongoing click animation isn't interrupted
+			//   by array overwrites
+			if err := u.SendAllRoomAttributes(conn); err != nil {
 				log.Printf("[usecase] fail to send all room attributes: %s\n", err)
 				continue
 			}
-
-			log.Printf("[usecase] send room states %+v", rs)
 
 			//TODO: debug oto cleanup first
 			// if err := oto.PlayPingSound(); err != nil {
