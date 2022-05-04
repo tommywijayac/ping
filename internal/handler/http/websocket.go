@@ -45,7 +45,10 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 				continue
 			}
 
-			h.ucDisplay.ReceiveRoomPingAck(roomID)
+			err = h.ucDisplay.ReceiveRoomPingAck(roomID)
+			if err != nil {
+				log.Printf("[http][handler] fail receiving room ping ack err: %s\n", err)
+			}
 		}
 	}()
 	//if websocket conn isn't created, then will not increment waitgroup
@@ -55,7 +58,7 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 	go func() {
 		err := h.ucDisplay.SendRoomPing(h.conn)
 		if err != nil {
-			log.Printf("[http][handler] write websocket message err: %s\n", err)
+			log.Printf("[http][handler] send room ping err: %s\n", err)
 		}
 	}()
 

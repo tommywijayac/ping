@@ -37,15 +37,15 @@ func (r *Repo) Listen(port string) error {
 	}
 }
 
-//Push will put data into channel
-func (r *Repo) push(data int) {
-	r.channel <- model.RawRoom{
-		ID:        data,
+//Push will put raw room data based on room ID into serial stream
+func (r *Repo) push(id int) {
+	r.stream <- model.RawRoom{
+		ID:        id,
 		Timestamp: time.Now().Unix(),
 	}
 }
 
-//[DEV] Push put an integer value into display channel
-func (r *Repo) Push(data int) {
-	r.push(data)
+//[DEV] Push put an room ID into serial stream
+func (r *Repo) Push(id int) {
+	r.push(id)
 }

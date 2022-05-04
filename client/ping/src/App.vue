@@ -48,6 +48,10 @@ export default {
     onPingAck: function(room) {
       //set clicked room state to inactive
       room.state = '';
+      console.log("set to inactive: ", room)
+
+      //send ack to server as well
+      this.connection.send(room.id)
     },
   },
   created: function(){
@@ -61,22 +65,9 @@ export default {
       var msg = JSON.parse(event.data)
       self.rooms = msg;
       console.log(msg)
-
-      // var rooms = []
-
-      // for (var i = 0; i < msg.length; i++) {
-      //   var room = {}
-      //   room.id = msg[i].id
-      //   room.title = msg[i].title
-      //   room.state = msg[i].state
-      //   rooms.push(room)
-      // }
-
-      // app.rooms = rooms
     }
 
-    this.connection.onopen = function(event) {
-      console.log(event)
+    this.connection.onopen = function() {
       console.log("Successfully connected to the echo websocket server...")
     }
   }
