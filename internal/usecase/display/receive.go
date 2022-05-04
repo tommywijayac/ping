@@ -18,13 +18,13 @@ func (u *Usecase) ReceiveRoomPingAck(roomID int) error {
 
 	//calculate stats
 	elapsed = time.Now().Unix() - r.FirstPingTimestamp
-	log.Printf("[stats] elapsed: %dsec. consecutive: %d", elapsed, r.ConsecutivePing)
+	log.Printf("[stats] elapsed: %dsec. count: %d", elapsed, r.ConsecutivePing)
 
 	//reset state and attributes
 	if err := u.repoRoom.SetAttributes(r.ID, "", 0, 0); err != nil {
 		return fmt.Errorf("[usecase] fail to reset room attributes: %w", err)
 	}
 
-	log.Printf("[usecase] receive room ping ack: %d\n", roomID)
+	log.Printf("[ReceiveRoomPingAck] receive room ping ack: %d\n", roomID)
 	return nil
 }

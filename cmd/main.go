@@ -49,7 +49,7 @@ func main() {
 	repoRoom := room.New(cfg.RoomConfig)
 
 	//init usecase
-	usecaseDisplay := display.New(repoSerial, repoRoom)
+	usecaseDisplay := display.New(cfg, repoSerial, repoRoom)
 
 	//init handler
 	handlerHttp := http.New(usecaseDisplay, wsClose, &appWg)

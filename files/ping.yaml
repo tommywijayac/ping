@@ -10,9 +10,15 @@ rooms:
     title: "ruang gurita"
     icon_path: "octopus.png"
   - id: 3
-    title: "ruang kura-kura"
+    title: "ruang penyu"
     icon_path: "turtle.png"
   - id: 4
     title: "ruang pari"
     icon_path: "ray.png"
+  - id: 5
+    title: "ruang ubur-ubur"
+    icon_path: "jellyfish.png"
+  - id: 6
+    title: "ruang lobster"
+    icon_path: "lobster.png"
 ping_delay: 5

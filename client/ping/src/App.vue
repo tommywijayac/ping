@@ -42,9 +42,6 @@ export default {
     }
   },
   methods: {
-    sendMessage: function(message) {
-      this.connection.send(message);
-    },
     onPingAck: function(room) {
       //set clicked room state to inactive
       room.state = '';

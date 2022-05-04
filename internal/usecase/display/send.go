@@ -15,20 +15,12 @@ func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
 		return fmt.Errorf("fail to write json to websocket: %v", err)
 	}
 
-	log.Printf("[usecase] send all room attributes: %+v\n", rs)
+	log.Printf("[SendAllRoomAttributes] send all room attributes: %+v\n", rs)
 	return nil
 }
 
-//TODO: function to read queue channel and send to client
-
-//TODO: this should receives data from serial channel, and put into display channel with rules:
-//1. sequential display call spanning less than 5 seconds is merged into one (the first)
-//2. ...
-//this means we need to keep track of data put in display channel
-//display channel acts as a queue ONLY, to trigger action (send to client)
-
 //SendRoomPing is a blocking function that sends a room state to client
-//every time new data is received in display repo channel, via supplied websocket connection.
+//via supplied websocket connection, every time new data is received in serial stream
 func (u *Usecase) SendRoomPing(conn *websocket.Conn) {
 	stream := u.repoSerial.Stream()
 
