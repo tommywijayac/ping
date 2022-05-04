@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -34,20 +33,24 @@ func (u *Usecase) SendRoomPing(conn *websocket.Conn) error {
 
 	for {
 		select {
-		case data := <-stream:
-			roomID := data.ID
+		case raw := <-stream:
+			id := raw.ID
+			ts := raw.Timestamp
 
 			for i := range u.rooms {
-				if u.rooms[i].ID == roomID {
+				if u.rooms[i].ID == id {
 					u.rooms[i].State = "active"
 
 					//TODO: if fulfill the requirement, put into queue channel
 					u.rooms[i].ConsecutivePing++
 					if u.rooms[i].FirstPingTimestamp == 0 {
-						u.rooms[i].FirstPingTimestamp = time.Now().Unix()
+						u.rooms[i].FirstPingTimestamp = ts
 					}
-					u.rooms[i].LastPingTimestamp = time.Now().Unix()
+					u.rooms[i].LastPingTimestamp = ts
+
+					break
 				}
+				return fmt.Errorf("receive unknown room ID: %d\n", id)
 			}
 
 			if err := conn.WriteJSON(u.rooms); err != nil {
