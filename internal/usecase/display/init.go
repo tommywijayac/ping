@@ -1,8 +1,6 @@
 package display
 
 import (
-	"fmt"
-
 	"github.com/tommywijayac/ping/internal/config"
 	"github.com/tommywijayac/ping/internal/model"
 	"github.com/tommywijayac/ping/internal/repo/serial"
@@ -10,7 +8,7 @@ import (
 
 type Usecase struct {
 	repoSerial *serial.Repo
-	rooms      []model.Room //state source-of-truth. retain room order
+	rooms      []model.Room //state source-of-truth. retain room order as stated in config
 }
 
 func New(rcfg []config.RoomConfig, serial *serial.Repo) *Usecase {
@@ -20,7 +18,6 @@ func New(rcfg []config.RoomConfig, serial *serial.Repo) *Usecase {
 			ID:       r.ID,
 			Title:    r.Title,
 			IconPath: r.IconPath,
-			State:    "", //all begin with inactive (empty)
 		})
 	}
 
@@ -30,26 +27,8 @@ func New(rcfg []config.RoomConfig, serial *serial.Repo) *Usecase {
 	}
 }
 
-//ReceiveRoomPingAck receives a room ping acknowledgement from client,
-//and will set room state to inactive.
-func (u *Usecase) ReceiveRoomPingAck(roomID int) error {
-	fmt.Println(roomID)
-
-	for i := range u.rooms {
-		if u.rooms[i].ID == roomID {
-			u.rooms[i].State = ""
-			u.rooms[i].ConsecutivePing = 0
-			u.rooms[i].FirstPing = 0
-		}
-	}
-
-	fmt.Println(u.rooms)
-
-	return nil
-}
-
-//[DEV] DevPush push data into serial repo, which should trigger
-//display client update.
-func (u *Usecase) DevPush(data int) {
-	u.repoSerial.Push(data)
+//[DEV] DevPush push room ID into serial repo, which should trigger
+//server to update client room state
+func (u *Usecase) DevPush(roomID int) {
+	u.repoSerial.Push(roomID)
 }

@@ -9,8 +9,9 @@ type Room struct {
 	ID       int    `json:"id"`
 	Title    string `json:"title"`
 	IconPath string `json:"icon_path"`
-	State    string `json:"state"`
 
-	ConsecutivePing int
-	FirstPing       int64
+	State              string `json:"state"`
+	ConsecutivePing    int
+	FirstPingTimestamp int64
+	LastPingTimestamp  int64
 }

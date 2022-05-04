@@ -15,14 +15,14 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 		if origin == client {
 			return true
 		}
-		log.Printf("http: handler: failed handshake attempt by unknown client: %s\n", origin)
+		log.Printf("[http][handler] handshake attempt by unknown client: %s\n", origin)
 		return false
 	}
 
 	var err error
 	h.conn, err = h.upgrader.Upgrade(w, r, w.Header())
 	if err != nil {
-		log.Fatalf("http: handler: upgrade to websocket err: %s", err)
+		log.Fatalf("[http][handler] upgrade to websocket err: %s", err)
 	}
 
 	go func() {
@@ -34,14 +34,14 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 				// 	return
 				// }
 
-				log.Printf("http: handler: read websocket message err: %s\n", err)
+				log.Printf("[http][handler] read websocket message err: %s\n", err)
 				return
 			}
 
 			//client is expected to send room ID
 			roomID, err := strconv.Atoi(string(message))
 			if err != nil {
-				log.Printf("http: handler: fail unmarshal websocket message err: %s\n", err)
+				log.Printf("[http][handler] fail unmarshal websocket message err: %s\n", err)
 				continue
 			}
 
@@ -55,13 +55,13 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 	go func() {
 		err := h.ucDisplay.SendRoomPing(h.conn)
 		if err != nil {
-			log.Printf("http: handler: write websocket message err: %s\n", err)
+			log.Printf("[http][handler] write websocket message err: %s\n", err)
 		}
 	}()
 
 	//send default room config
 	if err := h.ucDisplay.SendAllRoomAttributes(h.conn); err != nil {
-		log.Printf("http: handler: send default room err: %s\n", err)
+		log.Printf("[http][handler] send default room err: %s\n", err)
 	}
 
 	//wait for close signal from app
