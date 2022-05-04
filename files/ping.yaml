@@ -1,10 +1,17 @@
+#each room has 3 fields: id, title, icon_path. all is mandatory
+
+#icon_path should be defined relative to above directory.
+#then image files should be placed in .\client\ping\src\assets.
 rooms:
   - id: 1
-    title: "ruang ayam"
-    icon_path: ""
+    title: "ruang kepiting"
+    icon_path: "crab.png" 
   - id: 2
-    title: "ruang kambing"
-    icon_path: ""
+    title: "ruang gurita"
+    icon_path: "octopus.png"
   - id: 3
-    title: "ruang kucing"
-    icon_path: ""
+    title: "ruang kura-kura"
+    icon_path: "turtle.png"
+  - id: 4
+    title: "ruang pari"
+    icon_path: "ray.png"

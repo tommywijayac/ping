@@ -6,13 +6,14 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/tommywijayac/ping/internal/pkg/oto"
 )
 
 func (u *Usecase) SendAllRoomStates(conn *websocket.Conn) error {
 	if err := conn.WriteJSON(u.rooms); err != nil {
 		return fmt.Errorf("usecase: fail to write json to websocket: %v", err)
 	}
+
+	log.Printf("[usecase] send room states: %+v\n", u.rooms)
 
 	return nil
 }
@@ -39,9 +40,10 @@ func (u *Usecase) SendRoomPing(conn *websocket.Conn) error {
 			conn.WriteJSON(u.rooms)
 			log.Printf("writing %v", u.rooms)
 
-			if err := oto.PlayPingSound(); err != nil {
-				log.Printf("error playing ping sound: %s\n", err)
-			}
+			//TODO: debug oto cleanup first
+			// if err := oto.PlayPingSound(); err != nil {
+			// 	log.Printf("error playing ping sound: %s\n", err)
+			// }
 		}
 	}
 }

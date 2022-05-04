@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/tommywijayac/ping/internal/config"
-	"github.com/tommywijayac/ping/internal/pkg/oto"
 	"github.com/tommywijayac/ping/internal/repo/serial"
 
 	"github.com/tommywijayac/ping/internal/usecase/display"
@@ -58,7 +57,8 @@ func main() {
 	<-closeSig
 
 	fmt.Println("main: doing cleanup..")
-	oto.Close()
+	//TODO: gracefully oto cleanup without hang
+	//oto.Close()
 	appWg.Wait()
 
 	fmt.Println("main: terminated")
