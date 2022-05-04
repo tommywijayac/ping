@@ -11,22 +11,18 @@ import (
 func (u *Usecase) ReceiveRoomPingAck(roomID int) error {
 	elapsed := int64(0)
 
-	//use simplest approach O(n) since rooms would rarely grow
-	for i := range u.rooms {
-		if u.rooms[i].ID == roomID {
-			//calculate stats
-			elapsed = time.Now().Unix() - u.rooms[i].FirstPingTimestamp
-			log.Printf("[stats] elapsed: %dsec. consecutive: %d", elapsed, u.rooms[i].ConsecutivePing)
+	r, err := u.repoRoom.Get(roomID)
+	if err != nil {
+		return fmt.Errorf("[usecase] fail to get room attributes: %w", err)
+	}
 
-			//reset state and attributes
-			u.rooms[i].State = ""
-			u.rooms[i].ConsecutivePing = 0
-			u.rooms[i].FirstPingTimestamp = 0
-			u.rooms[i].LastPingTimestamp = 0
+	//calculate stats
+	elapsed = time.Now().Unix() - r.FirstPingTimestamp
+	log.Printf("[stats] elapsed: %dsec. consecutive: %d", elapsed, r.ConsecutivePing)
 
-			break
-		}
-		return fmt.Errorf("receive unknown room ID: %d\n", roomID)
+	//reset state and attributes
+	if err := u.repoRoom.SetAttributes(r.ID, "", 0, 0); err != nil {
+		return fmt.Errorf("[usecase] fail to reset room attributes: %w", err)
 	}
 
 	log.Printf("[usecase] receive room ping ack: %d\n", roomID)

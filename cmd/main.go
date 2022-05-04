@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/tommywijayac/ping/internal/config"
+	"github.com/tommywijayac/ping/internal/repo/room"
 	"github.com/tommywijayac/ping/internal/repo/serial"
 
 	"github.com/tommywijayac/ping/internal/usecase/display"
@@ -39,12 +40,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("main: fail to init config: %v\n", err)
 	}
+	if len(cfg.RoomConfig) == 0 {
+		log.Fatalf("[main] no room defined")
+	}
 
 	//init repo
 	repoSerial := serial.New("test")
+	repoRoom := room.New(cfg.RoomConfig)
 
 	//init usecase
-	usecaseDisplay := display.New(cfg.RoomConfig, &repoSerial)
+	usecaseDisplay := display.New(repoSerial, repoRoom)
 
 	//init handler
 	handlerHttp := http.New(usecaseDisplay, wsClose, &appWg)

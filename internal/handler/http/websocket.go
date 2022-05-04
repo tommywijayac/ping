@@ -56,10 +56,7 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 
 	//cleanup by closing data channel, which should be on repo
 	go func() {
-		err := h.ucDisplay.SendRoomPing(h.conn)
-		if err != nil {
-			log.Printf("[http][handler] send room ping err: %s\n", err)
-		}
+		h.ucDisplay.SendRoomPing(h.conn)
 	}()
 
 	//send default room config

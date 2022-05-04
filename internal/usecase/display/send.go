@@ -10,11 +10,16 @@ import (
 //SendAllRoomAttributes sends all registered rooms attributes to client
 //via supplied websocket connection.
 func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
-	if err := conn.WriteJSON(u.rooms); err != nil {
+	rs := u.repoRoom.GetAll()
+	if len(rs) == 0 {
+		return fmt.Errorf("rooms not initialized")
+	}
+
+	if err := conn.WriteJSON(rs); err != nil {
 		return fmt.Errorf("[usecase] fail to send all room attributes: %v", err)
 	}
 
-	log.Printf("[usecase] send all room attributes: %+v\n", u.rooms)
+	log.Printf("[usecase] send all room attributes: %+v\n", rs)
 	return nil
 }
 
@@ -28,7 +33,7 @@ func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
 
 //SendRoomPing is a blocking function that sends a room state to client
 //every time new data is received in display repo channel, via supplied websocket connection.
-func (u *Usecase) SendRoomPing(conn *websocket.Conn) error {
+func (u *Usecase) SendRoomPing(conn *websocket.Conn) {
 	stream := u.repoSerial.Stream()
 
 	for {
@@ -37,26 +42,35 @@ func (u *Usecase) SendRoomPing(conn *websocket.Conn) error {
 			id := raw.ID
 			ts := raw.Timestamp
 
-			for i := range u.rooms {
-				if u.rooms[i].ID == id {
-					u.rooms[i].State = "active"
-
-					//TODO: if fulfill the requirement, put into queue channel
-					u.rooms[i].ConsecutivePing++
-					if u.rooms[i].FirstPingTimestamp == 0 {
-						u.rooms[i].FirstPingTimestamp = ts
-					}
-					u.rooms[i].LastPingTimestamp = ts
-
-					break
-				}
-				return fmt.Errorf("receive unknown room ID: %d\n", id)
+			//TODO: should be in usecase/serial until ----
+			r, err := u.repoRoom.Get(id)
+			if err != nil {
+				log.Printf("[usecase] fail to send room ping: %s\n", err)
+				continue
 			}
 
-			if err := conn.WriteJSON(u.rooms); err != nil {
-				return fmt.Errorf("[usecase] fail to send all room attributes: %v", err)
+			//TODO: 5 from config
+			if r.LastPingTimestamp != 0 && ts-r.LastPingTimestamp < 5 {
+				//ignore repeated consecutive ping in short timespan
+				continue
 			}
-			log.Printf("[usecase] send room states %+v", u.rooms)
+
+			//set room to active, update attributes
+			if err := u.repoRoom.SetAttributes(id, "active", r.ConsecutivePing+1, ts); err != nil {
+				log.Printf("[usecase] fail to set room attributes: %s\n", err)
+				continue
+			}
+
+			//notify changes to queue
+			//TODO: ---------------------------------
+
+			rs := u.repoRoom.GetAll()
+			if err := conn.WriteJSON(rs); err != nil {
+				log.Printf("[usecase] fail to send all room attributes: %s\n", err)
+				continue
+			}
+
+			log.Printf("[usecase] send room states %+v", rs)
 
 			//TODO: debug oto cleanup first
 			// if err := oto.PlayPingSound(); err != nil {
