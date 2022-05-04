@@ -60,7 +60,7 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 	}()
 
 	//send default room config
-	if err := h.ucDisplay.SendAllRoomStates(h.conn); err != nil {
+	if err := h.ucDisplay.SendAllRoomAttributes(h.conn); err != nil {
 		log.Printf("http: handler: send default room err: %s\n", err)
 	}
 

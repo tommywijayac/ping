@@ -8,12 +8,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func (u *Usecase) SendAllRoomStates(conn *websocket.Conn) error {
+func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
 	if err := conn.WriteJSON(u.rooms); err != nil {
 		return fmt.Errorf("usecase: fail to write json to websocket: %v", err)
 	}
 
-	log.Printf("[usecase] send room states: %+v\n", u.rooms)
+	log.Printf("[usecase] send all room attributes: %+v\n", u.rooms)
 
 	return nil
 }
