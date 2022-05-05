@@ -1,6 +1,7 @@
 package display
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -9,7 +10,7 @@ import (
 
 //SendAllRoomAttributes sends all registered rooms attributes to client
 //via supplied websocket connection.
-func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
+func (u *Usecase) SendAllRoomAttributes(ctx context.Context, conn *websocket.Conn) error {
 	rs := u.repoRoom.GetAll()
 	if err := conn.WriteJSON(rs); err != nil {
 		return fmt.Errorf("fail to write json to websocket: %v", err)
@@ -21,11 +22,13 @@ func (u *Usecase) SendAllRoomAttributes(conn *websocket.Conn) error {
 
 //SendRoomPing is a blocking function that sends a room state to client
 //via supplied websocket connection, every time new data is received in serial stream
-func (u *Usecase) SendRoomPing(conn *websocket.Conn) {
+func (u *Usecase) SendRoomPing(ctx context.Context, conn *websocket.Conn) {
 	stream := u.repoSerial.Stream()
 
 	for {
 		select {
+		case <-ctx.Done():
+			return
 		case raw := <-stream:
 			id := raw.ID
 			ts := raw.Timestamp
@@ -52,7 +55,7 @@ func (u *Usecase) SendRoomPing(conn *websocket.Conn) {
 			//2. FE & BE always in sync in all time. no need to build separate mechanism to sync every x min
 			//3. vue reactivity is pretty smart. even though array changes, ongoing click animation isn't interrupted
 			//   by array overwrites
-			if err := u.SendAllRoomAttributes(conn); err != nil {
+			if err := u.SendAllRoomAttributes(ctx, conn); err != nil {
 				log.Printf("[usecase] fail to send all room attributes: %s\n", err)
 				continue
 			}

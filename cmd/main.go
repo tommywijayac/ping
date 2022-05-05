@@ -21,17 +21,17 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	closeSig := make(chan bool, 1)
-
-	//component close signal
+	//component close signals
+	appClose := make(chan bool, 1)
 	wsClose := make(chan bool, 1)
-
+	//wait group to wait components finish their clean up
 	appWg := sync.WaitGroup{}
 	go func() {
 		sig := <-sigs
-		fmt.Println()
 		fmt.Println(sig)
-		closeSig <- true
+
+		//trigger components clean up
+		appClose <- true
 		wsClose <- true
 	}()
 
@@ -58,12 +58,12 @@ func main() {
 
 	initServer(handlerHttp)
 
-	//wait for interrupt or terminate signal
-	<-closeSig
-
-	fmt.Println("main: doing cleanup..")
+	//app wait here until termination/interrupt signal
+	<-appClose
 	//TODO: gracefully oto cleanup without hang
 	//oto.Close()
+
+	//wait here for components clean up (if any)
 	appWg.Wait()
 
 	fmt.Println("main: terminated")
