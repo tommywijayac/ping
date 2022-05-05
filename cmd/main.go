@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/tommywijayac/ping/internal/config"
+	"github.com/tommywijayac/ping/internal/pkg/oto"
 	"github.com/tommywijayac/ping/internal/repo/room"
 	"github.com/tommywijayac/ping/internal/repo/serial"
 
@@ -60,8 +61,9 @@ func main() {
 
 	//app wait here until termination/interrupt signal
 	<-appClose
-	//TODO: gracefully oto cleanup without hang
-	//oto.Close()
+
+	//any termination fn here
+	oto.Close()
 
 	//wait here for components clean up (if any)
 	appWg.Wait()

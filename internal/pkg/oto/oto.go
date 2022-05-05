@@ -78,9 +78,9 @@ func Play(filepath string) error {
 //Close will close context which would close player as well
 func Close() {
 	if o != nil {
-		log.Println("pkg: oto: closing context..")
+		log.Println("[pkg][oto] closing..")
 		o.player.Close()
 		o.ctx.Close()
 	}
-	log.Println("pkg: oto: done closing context")
+	log.Println("[pkg][oto] done closing")
 }

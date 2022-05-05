@@ -44,7 +44,6 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 
 			//since SendRoomPing is a blocking func, reaching here means for loop has ended (by ctx cancel)
 			wait.Done()
-			log.Println("DEBUG from goroutine A")
 		}()
 		wait.Add(1)
 
@@ -53,7 +52,6 @@ func (h *Handler) HandlerClientWebsocket(w http.ResponseWriter, r *http.Request)
 				select {
 				case <-ctx.Done():
 					wait.Done()
-					log.Println("DEBUG from goroutine B")
 
 					//must use 'return' instead of 'break'
 					//somehow 'break' makes the for-loop execute one more time,

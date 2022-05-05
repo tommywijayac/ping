@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
+	"github.com/tommywijayac/ping/internal/pkg/oto"
 )
 
 //SendAllRoomAttributes sends all registered rooms attributes to client
@@ -60,10 +61,9 @@ func (u *Usecase) SendRoomPing(ctx context.Context, conn *websocket.Conn) {
 				continue
 			}
 
-			//TODO: debug oto cleanup first
-			// if err := oto.PlayPingSound(); err != nil {
-			// 	log.Printf("error playing ping sound: %s\n", err)
-			// }
+			if err := oto.PlayPingSound(); err != nil {
+				log.Printf("error playing ping sound: %s\n", err)
+			}
 		}
 	}
 }
